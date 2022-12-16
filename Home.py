@@ -2,26 +2,22 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-st.title('Welcome home my child!')
 
-st.subheader('Its time to eat butterscotch pie')
-'Please use the sidebar on the left to navigate to the different data presentations!'
 
-DATE_COLUMN = 'date/time'
-DATA_URL = ('https://s3-us-west-2.amazonaws.com/streamlit-demo-data/uber-raw-data-sep14.csv.gz')
+CSV_FILE = 'LoadingStatistics.csv'
 
-@st.cache
+
 def load_data(nrows):
-    #Loads Uber data and converts it into the pandas dataframe
-    data = pd.read_csv(DATA_URL, nrows=nrows)
-    lowercase = lambda x: str(x).lower()
-    data.rename(lowercase, axis='columns', inplace=True)
-    data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
-    return data
+    df = pd.read_csv(CSV_FILE, nrows=nrows, delimiter=";")
+    df.columns = ['Source System','Source Description', 'Source File', 'Source File Pattern', \
+        'Source File Type', 'Run Date', 'Load Step', 'Load Step Date Time', \
+        'Load Step Start Date Time', 'Load Step End Date Time', 'Load Step Status', \
+        'Load Step Exception', 'Load Step Exception Trace']
 
-#Load 10 000 rows of data into the dataframe.
-with st.spinner(text='Loading data...'):
-    data = load_data(10000)
+    return df
+
+with st.spinner(text="Loading data, please wait..."):
+    data = load_data(100000)
 st.success('Done!')
 
-#notify the reader that the data was successfully loaded
+st.write(data)
