@@ -27,7 +27,6 @@ timeFiltdf = basedf[ (basedf['Run Date'] >= startTime) & (basedf['Run Date'] <= 
 selected_source_file = st.selectbox('Select source File:', \
     options= timeFiltdf['Sourcefile'].unique())
 
-selected_source_file
 
 selFildf = timeFiltdf[timeFiltdf['Sourcefile'] == selected_source_file]
 
@@ -35,6 +34,15 @@ selFildf
 
 reduceddf = selFildf[['Sourcefile Name', 'Sourcefile Size', 'Run Date']].copy()
 reduceddf
+
+skibidi = reduceddf.groupby(['Sourcefile Name', 'Run Date'])
+skibidi
+
+#shabooki = reduceddf.aggregate(['Sourcefile Name', 'Run Date'])
+#shabooki
+
+#for( reduceddf['Sourcefile Name'].groupby()):
+ #   wowhelpme = reduceddf.pivot_table()
 
 
 
