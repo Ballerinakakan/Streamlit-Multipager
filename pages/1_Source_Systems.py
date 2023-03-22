@@ -6,7 +6,9 @@ import datetime as dt
 import dateutil.parser as dp
 import Home as hm
 
-STEP_STATUSES = ['Scheduled', 'Inisiated/Queued', 'Running', 'Restarted', 'Completed', 'Failed', 'Unknown']
+#st.set_page_config(layout="wide")
+
+STEP_STATUSES = ['Initiated/Queued', 'Scheduled', 'Running', 'Restarted', 'Completed', 'Failed', 'Unknown']
 
 
 
@@ -71,14 +73,26 @@ for index, row in filtered_data_time.iterrows():
         statDic[index] = row['Load Step Status']
 
 
+#filtered_data_time_sys
+
+st.write(filtered_data_time_sys[['Load Step Status']].value_counts()['Completed'])
+
+col1, col2, col3, col4, col5, col6 = st.columns(6)
+col1.metric(label="Completed", value=filtered_data_time_sys[['Load Step Status']].value_counts().get('Completed', 0), delta=0)
+col2.metric(label='Failed', value=filtered_data_time_sys[['Load Step Status']].value_counts().get('Failed', 0), delta=0, delta_color='inverse')
+col3.metric(label='Running', value=filtered_data_time_sys[['Load Step Status']].value_counts().get('Running', 0), delta=0)
+#col4.metric(label='Failed', value=filtered_data_time_sys[['Load Step Status']].value_counts()['Scheduled'], delta=0, delta_color='inverse')
+#Icke filter, övriga och kalla dem för Waiting
+#Kika på varför den dör om den inte hittar några fel
+
 if statDic == {}:
-    st.image('Images/Green.png')
+    #st.image('Images/Green.png')
+    st.success('All activeties have been completed!', icon="💯")
 elif 'Failed' in statDic.values():
-    st.image('Images/Red.png')
+    #st.image('Images/Red.png')
+    st.error('Some activeties have failed!', icon="🙈")
 else:
-    st.image('Images/Yellow.png')
-
-
+    st.warning('Some activeties are still running!', icon="🏃")
 
 
 
@@ -112,6 +126,10 @@ st.subheader(f'Source Systems that have ran between {start_time} and {end_time}:
 #    statuses = dbl_flt['Load Step Status'].value_counts()
 #    st.bar_chart(statuses)
 
+
+
+
+
 df2 = filtered_data_time_sys[['Source System', 'Load Step Status']].copy()
 histDic = {}
 
@@ -136,15 +154,18 @@ st.bar_chart(histDic)
 actdbRes = pd.DataFrame()
 st.subheader('Source Files that have been ran:')
 sofidf = filtered_data_time_sys[['Source System', 'Source File', 'Load Step Status']]
-lowcol1, lowcol2 = st.columns(2)
+#lowcol1, lowcol2 = st.columns(2)
 
 #maybe change it into generating tabs that you can click instead?
+
+
 
 for sys in sofidf['Source System'].unique():
     st.subheader(f'Source Files and their statuses that have been ran by {sys}')
     actsysdf = sofidf[sofidf['Source System'] == sys]    
-    with lowcol1:
-        act_flt = st.multiselect('Select Source Files:', options=actsysdf['Source File'].unique(),default=actsysdf['Source File'].unique(),key=f'{sys}-key')
+    #with lowcol1:
+        #act_flt = st.multiselect('Select Source Files:', options=actsysdf['Source File'].unique(),default=actsysdf['Source File'].unique(),key=f'{sys}-key')
+
 
     for sta in STEP_STATUSES:
         actDic = {}
@@ -158,8 +179,8 @@ for sys in sofidf['Source System'].unique():
                 actDic.update({act : 0})
         histDic.update({sta : actDic})
     
-        with lowcol2:
-            st.bar_chart(histDic)
+    #with lowcol2:
+    st.bar_chart(histDic)
     
     
 
