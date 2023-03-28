@@ -44,127 +44,61 @@ end_time = dt.datetime.combine(end_date, end_hour)
 
 
 
+#Converts the timedate string into pandas Timestamp and then Forces it into being in pyTimedate instead
 df['Run Date'] = pd.to_datetime(df['Run Date'])
+arr_date = df['Run Date'].dt.to_pydatetime()
+df['Run Date'] = pd.Series(arr_date, dtype="object")
+
+
+
+
+
 filtered_data_time = df[ (df['Run Date'] >= start_time) & (df['Run Date'] <= end_time)]
 
-filtered_data_time
+#filtered_data_time
 
 reduceddf = filtered_data_time[['Source File', 'Run Date']]
 
 timelinedf = reduceddf.drop_duplicates()
-timelinedf
 timelinedf = timelinedf.reset_index()
 timelinedf = timelinedf[['Source File', 'Run Date']]
 
-timelinedf
+#timelinedf
 
 items = []
 
 for index, row in timelinedf.iterrows():
       items.append({"id": index, "content": row['Source File'], "start": row['Run Date'].strftime("%Y-%m-%dT%H:%M:%S")})
 
-items
+#items
 
 #The format that it should be in
 #items = [ {"id": 1, "content": "Hej", "start": "2022-10-20T12:00:00"} ]
 
 
-timeline = st_timeline(items, groups=[], options={}, height="300px")
-st.subheader("Selected item")
-st.write(timeline)
+timeline = st_timeline(items, groups=[], options={}, height="700px")
+#st.subheader("Selected item")
+#st.write(timeline)
+
+
+#st.write(type(t))
+#st.write(type(timelinedf._get_value(0, 'Run Date')))
+
+#st.write((t))
+#st.write((timelinedf._get_value(0, 'Run Date')))
+
+
+#st.write((t) == (timelinedf._get_value(0, 'Run Date')))
+
+if timeline:
+    t = dt.datetime.strptime(timeline["start"], "%Y-%m-%dT%H:%M:%S")
+    filtereddf = filtered_data_time[ (filtered_data_time['Source File'] == timeline["content"]) & (filtered_data_time['Run Date'] == t)]
+    filtereddf
 
 
 
 
 
+st.write("-------------------------------------------------------------------------------------------")
 
 
-
-
-
-
-
-#----------------------------------OLD ACTIVETIES-------------------------------------------------------------------
-
-#df['Run Date'] = pd.to_datetime(df['Run Date'])
-#filtered_data_time = df[ (df['Run Date'] >= start_time) & (df['Run Date'] <= end_time)]
-
-
-
-
-actDic = {}
-actdf = fildf[['Load Step', 'Run Date']].copy(deep=True)
-for index, row in filtered_data_time.iterrows():
-    actParsed = row['Load Step'].split('-')[0]
-    if actParsed in actDic:
-        actDic[actParsed] = actDic.get(actParsed) + 1
-    else:
-        actDic[actParsed] = 1
-        graphdf = pd.DataFrame()
-
-
-
-chart_data = pd.DataFrame(
-    np.random.randn(20, 3),
-    columns=['a', 'b', 'c'])
-
-
-
-
-date_indexed_dataframe = actdf.copy(deep=True)
-#date_indexed_dataframe
-
-
-#pd.DataFrame.pivot(date_indexed_dataframe, index='Load Step Date Time', columns=[])
-
-
-#date_indexed_dataframe.set_index('Run Date', inplace=True)
-date_indexed_dataframe.rename(columns= {'Load Step':'LoadStep'}, inplace=True)
-
-
-
-
-date_indexed_dataframe['LoadStep'] = date_indexed_dataframe.LoadStep.str.split('-').str[0]
-date_indexed_dataframe
-'lol'
-
-final = date_indexed_dataframe.groupby(['LoadStep', 'Run Date'], as_index=False).size()
-#st.write(counted)
-#counteddf = counted.to_frame()
-#'Converted!'
-#counteddf
-#st.write(counteddf)
-#counteddf.rename(columns= {list(counteddf)[0] : 'Load Step'}, inplace= True)
-#final
-#asfasf = counteddf.unstack(level=0)
-#st.write(type(asfasf))
-#asfasf.rename(columns=asfasf.iloc[0])
-#final = counteddf.reset_index()
-final.rename(columns= {list(final)[2] : 'Count'}, inplace= True)
-df = final.astype({'Count': 'int'})
-final
-'aaaaa'
-finalfinal = final.pivot(index='Run Date', columns='LoadStep', values='Count')
-finalfinal.fillna(0, inplace=True)
-finalfinal
-st.line_chart(finalfinal)
-
-#pivoted = pd.DataFrame.pivot(date_indexed_dataframe, index='Run Date', columns='LoadStep')
-#pivoted
-
-#Try to make a chart of amount of times activity ran over time, where time is filtered by the filters at the top....
-#this is gonna be hell to figure out. Could make it so {activity : [(time, runs), (time, runs)], activity2 : [(time: runs), (time, runs)]}
-#could also make a dataframe with the colums as the activeties but not sure how to place time and runs to make it draw.
-
-#Kika på lappen
-#chart_data
-#st.line_chart(chart_data)
-
-#actdf
-#actDic
-
-#st.line_chart(date_indexed_dataframe)
-
-    #act1    act2    act3
-    #count   count   count
-    #date    date    date
