@@ -4,25 +4,26 @@ import numpy as np
 import time as tm
 import datetime as dt
 import dateutil.parser as dp
+from streamlit_timeline import st_timeline
 import Home as hm
 
 
 STEP_STATUSES = ['Scheduled', 'Inisiated/Queued', 'Running', 'Restarted', 'Completed', 'Failed', 'Unknown']
 
 #cur_time = dt.datetime.now()
-cur_time = dt.datetime(2022, 2, 12, 1, 0, 0) #We're living in the past so that the first 10000 rows of data aren't too far away
+cur_time = dt.datetime(2022, 2, 3, 1, 0, 0) #We're living in the past so that the first 10000 rows of data aren't too far away
 df = hm.data
 
 
-selected_source_system = st.selectbox('Select source systems:', \
-    options=df['Source System'].unique())
+#selected_source_system = st.selectbox('Select source systems:', \
+#    options=df['Source System'].unique())
 
 
 #Below is to filter to only look at one source file at a time
-selected_source_file = st.selectbox('Select source File:', \
-    options= df[(df['Source System'] == selected_source_system)]['Source File'].unique())
+#selected_source_file = st.selectbox('Select source File:', \
+#    options= df[(df['Source System'] == selected_source_system)]['Source File'].unique())
 
-fildf = df[df['Source System'] == selected_source_system][df['Source File'] == selected_source_file]
+#fildf = df[df['Source System'] == selected_source_system][df['Source File'] == selected_source_file]
 #fildf
 
 #old_time = cur_time - dt.timedelta(days=30)
@@ -41,8 +42,54 @@ with col2:
 start_time = dt.datetime.combine(start_date, start_hour)
 end_time = dt.datetime.combine(end_date, end_hour)
 
+
+
 df['Run Date'] = pd.to_datetime(df['Run Date'])
 filtered_data_time = df[ (df['Run Date'] >= start_time) & (df['Run Date'] <= end_time)]
+
+filtered_data_time
+
+reduceddf = filtered_data_time[['Source File', 'Run Date']]
+
+timelinedf = reduceddf.drop_duplicates()
+timelinedf
+timelinedf = timelinedf.reset_index()
+timelinedf = timelinedf[['Source File', 'Run Date']]
+
+timelinedf
+
+items = []
+
+for index, row in timelinedf.iterrows():
+      items.append({"id": index, "content": row['Source File'], "start": row['Run Date'].strftime("%Y-%m-%dT%H:%M:%S")})
+
+items
+
+#The format that it should be in
+#items = [ {"id": 1, "content": "Hej", "start": "2022-10-20T12:00:00"} ]
+
+
+timeline = st_timeline(items, groups=[], options={}, height="300px")
+st.subheader("Selected item")
+st.write(timeline)
+
+
+
+
+
+
+
+
+
+
+
+
+#----------------------------------OLD ACTIVETIES-------------------------------------------------------------------
+
+#df['Run Date'] = pd.to_datetime(df['Run Date'])
+#filtered_data_time = df[ (df['Run Date'] >= start_time) & (df['Run Date'] <= end_time)]
+
+
 
 
 actDic = {}
