@@ -29,6 +29,9 @@ df = hm.data
 #old_time = cur_time - dt.timedelta(days=30)
 old_time = cur_time - dt.timedelta(days=180)
 
+filtered_source_systems = st.multiselect('Select source systems:', \
+    options=df['Source System'].unique(), default=df['Source System'].unique() )
+
 col1, col2 = st.columns(2)
 
 with col1:
@@ -57,7 +60,13 @@ filtered_data_time = df[ (df['Run Date'] >= start_time) & (df['Run Date'] <= end
 
 #filtered_data_time
 
-reduceddf = filtered_data_time[['Source File', 'Run Date']]
+sysfiltereddf = filtered_data_time[filtered_data_time['Source System'].isin(filtered_source_systems)]
+#sysfiltereddf
+
+
+reduceddf = sysfiltereddf[['Source File', 'Run Date']]
+
+
 
 timelinedf = reduceddf.drop_duplicates()
 timelinedf = timelinedf.reset_index()
